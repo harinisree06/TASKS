@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Indian Cities</title>
+    <style>
+        /* Basic CSS styling */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #a1c4fd, #c2e9fb);
+        }
+
+        .weather-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .weather-container h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .weather-container p {
+            font-size: 18px;
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .temperature {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Weather App - Indian Cities</h1>
+    <select id="city-select" onchange="fetchWeather()">
+        <option value="Mumbai">Mumbai</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Bangalore">Bangalore</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Pune">Pune</option>
+        <option value="Jaipur">Jaipur</option>
+        <option value="Ahmedabad">Ahmedabad</option>
+    </select>
+
+    <div class="weather-container">
+        <h2>Weather in <span id="city-name">Mumbai</span></h2>
+        <p class="temperature" id="temperature">--°C</p>
+        <p id="weather-description">Loading...</p>
+    </div>
+
+    <script>
+        // API details
+        const apiKey = "b59fd37582852d715a463d893f9b7cda";
+
+        // Fetching the weather data
+        async function fetchWeather() {
+            const city = document.getElementById("city-select").value;
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.cod === 200) {
+                    document.getElementById("city-name").textContent = data.name;
+                    document.getElementById("temperature").textContent = `${data.main.temp}°C`;
+                    document.getElementById("weather-description").textContent = data.weather[0].description;
+                } else {
+                    document.getElementById("weather-description").textContent = "City not found.";
+                }
+            } catch (error) {
+                document.getElementById("weather-description").textContent = "Error fetching data.";
+            }
+        }
+
+        // Initial weather fetch for the default city
+        fetchWeather();
+    </script>
+
+</body>
+</html>
