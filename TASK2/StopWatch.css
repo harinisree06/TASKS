@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #282c34;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.stopwatch {
+    text-align: center;
+}
+
+h1 {
+    font-size: 5rem;
+    margin: 0;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+button {
+    background-color: #61dafb;
+    border: none;
+    border-radius: 5px;
+    color: #282c34;
+    font-size: 1.5rem;
+    margin: 0 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #21a1f1;
+}
+
+.laps {
+    margin-top: 20px;
+    text-align: left;
+}
