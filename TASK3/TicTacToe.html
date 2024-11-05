@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X O Game with Confetti</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('http://media.indiedb.com/images/games/1/39/38259/XO-indieDB.png') no-repeat center center fixed; /* Replace with your image URL */
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 150px); 
+            grid-template-rows: repeat(3, 150px);
+            gap: 10px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            visibility: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .cell {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            cursor: pointer;
+            border: 4px solid #000;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .cell:hover {
+            background-color: rgba(255, 255, 255, 1); 
+            color: #333;
+        }
+
+        .cell:active {
+            background-color: #ddd;
+        }
+
+        .message {
+            font-size: 24px;
+            margin-top: 20px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .controls {
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .play-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .quit-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .resume-btn {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 100px);
+                grid-template-rows: repeat(3, 100px);
+            }
+
+            .cell {
+                font-size: 36px;
+            }
+
+            .message {
+                font-size: 20px;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            font-size: 30px;
+            color: white;
+            animation: pop 2s linear forwards;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: translate(-50%, -100%) scale(0.3);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, 100vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-container" id="gameBoard">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div class="controls">
+        <button class="play-btn" onclick="startGame()">Play</button>
+        <button class="quit-btn" onclick="quitGame()">Quit</button>
+        <button class="resume-btn" onclick="resumeGame()">Resume</button>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        const board = ['', '', '', '', '', '', '', '', ''];
+        let isGameActive = false;
+
+        function toggleXO(event) {
+            if (!isGameActive) return;
+
+            const cell = event.target;
+            const index = Array.from(cell.parentNode.children).indexOf(cell);
+
+            if (board[index] === '') {
+                board[index] = currentPlayer;
+                cell.textContent = currentPlayer;
+
+                if (checkWin(currentPlayer)) {
+                    displayWinner(currentPlayer);
+                    triggerConfetti();
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                }
+            }
+        }
+
+        function checkWin(player) {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontal
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Vertical
+                [0, 4, 8], [2, 4, 6] // Diagonal
+            ];
+
+            return winningCombinations.some(combination => {
+                return combination.every(index => board[index] === player);
+            });
+        }
+
+        function displayWinner(player) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = `🎉🎉🎉 ${player} YOU WON! 🎉🎉🎉`;
+            isGameActive = false;
+        }
+
+        function triggerConfetti() {
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => createConfetti(), i * 100);
+            }
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.textContent = Math.random() > 0.5 ? 'X' : 'O'; // Random X or O
+
+            const randomX = Math.random() * window.innerWidth;
+            confetti.style.left = `${randomX}px`;
+
+            document.body.appendChild(confetti);
+
+            // Remove confetti after animation ends
+            setTimeout(() => {
+                document.body.removeChild(confetti);
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const cells = document.querySelectorAll('.grid-container > div');
+            cells.forEach(cell => {
+                cell.addEventListener('click', toggleXO);
+            });
+        });
+
+        function startGame() {
+            const boardDiv = document.getElementById('gameBoard');
+            boardDiv.style.visibility = 'visible';
+            resetGame();
+            isGameActive = true;
+        }
+
+        function resetGame() {
+            const cells = document.querySelectorAll('.grid-container > div');
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+
+            for (let i = 0; i < board.length; i++) {
+                board[i] = '';
+            }
+            document.getElementById('message').textContent = '';
+            currentPlayer = 'X';
+        }
+
+        function quitGame() {
+            resetGame();
+            const boardDiv = document.getElementById('gameBoard');
+            boardDiv.style.visibility = 'hidden';
+            isGameActive = false;
+        }
+
+        function resumeGame() {
+            isGameActive = true;
+            const boardDiv = document.getElementById('gameBoard');
+            boardDiv.style.visibility = 'visible';
+        }
+    </script>
+</body>
+</html>
